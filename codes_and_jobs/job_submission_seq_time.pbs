@@ -1,0 +1,49 @@
+#!/bin/bash
+#PBS -N DataCollection_ImplicitParImplementation
+#PBS -o ./sequentialParData_time_Output.out
+#PBS -e ./sequentialParData_time_Err.err
+#PBS -q short_cpuQ
+#PBS -l walltime=2:00:00
+#PBS -l select=1:ncpus=4:mem=10mb
+
+# Load the gcc91 module
+module load gcc91 || exit 1
+
+# Change to the working directory
+cd /home/nicolo.cecchin/Sequential || exit 1
+
+# Compile the program
+g++ -std=c++11 -O3 -march=native matrix_transp_seq.cpp -o matrix_transp_seq_time
+if [[ $? -ne 0 ]]; then
+    echo "Compilation failed!" >> $OUTPUT_FILE
+    exit 1
+fi
+
+# Define the output file for the times
+OUTPUT_FILE="sequential_results_time.csv"
+
+# Initialize the output file with a header
+echo "n, run, seconds_for_checksym, seconds_for_transposition" > $OUTPUT_FILE
+
+# Loop over powers of two from 2^4 (16) to 2^12 (4096)
+for ((p=4; p<=12; p++)); do
+    n=$((2**p))  # Compute 2^p
+    for ((i=1; i<=100; i++)); do
+        PROGRAM_OUTPUT=$(./matrix_transp_seq_time $n 2>/dev/null)
+        
+        if [[ $? -ne 0 ]]; then
+            echo "$n, $i, ERROR, ERROR" >> $OUTPUT_FILE
+            continue
+        fi
+
+        if [[ -z "$PROGRAM_OUTPUT" || $(echo "$PROGRAM_OUTPUT" | grep -c ',') -ne 1 ]]; then
+            echo "$n, $i, ERROR, ERROR" >> $OUTPUT_FILE
+            continue
+        fi
+
+        CHECKSYM_TIME=$(echo "$PROGRAM_OUTPUT" | cut -d ',' -f 1)
+        TRANSPOSITION_TIME=$(echo "$PROGRAM_OUTPUT" | cut -d ',' -f 2)
+
+        echo "$n, $i, $CHECKSYM_TIME, $TRANSPOSITION_TIME" >> $OUTPUT_FILE
+    done
+done

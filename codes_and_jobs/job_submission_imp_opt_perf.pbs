@@ -1,0 +1,50 @@
+#!/bin/bash
+#PBS -N DataCollection_ImplicitParImplementation
+#PBS -o ./implicitParData_perf_Output.out
+#PBS -e ./implicitParData_perf_Err.err
+#PBS -q short_cpuQ
+#PBS -l walltime=2:00:00
+#PBS -l select=1:ncpus=4:mem=10mb
+
+# Load the gcc91 module
+module load gcc91 || exit 1
+module load perf || exit 1 
+
+# Change to the working directory
+cd /home/nicolo.cecchin/Implicit_opt || exit 1
+
+# Compile the program
+g++ -std=c++11 -O3 -march=native matrix_transp_imp.cpp -o matrix_transp_imp_perf
+
+# Define the output file
+OUTPUT_FILE="implicit_results_perf.csv"
+
+# Initialize the output file with a header
+echo "n, run, seconds_for_checksym, seconds_for_transposition, cache_misses" > $OUTPUT_FILE
+
+# Loop over powers of two from 2^4 (16) to 2^12 (4096)
+for ((p=4; p<=12; p++)); do
+    n=$((2**p))  # Compute 2^p
+    for ((i=1; i<=100; i++)); do
+        # Execute the program and collect the execution times
+        PROGRAM_OUTPUT=$(./matrix_transp_imp_perf $n 2>/dev/null)
+        
+        if [[ $? -ne 0 ]]; then
+            echo "$n, $i, ERROR, ERROR, ERROR" >> $OUTPUT_FILE
+            continue
+        fi
+
+        # Extract execution times from PROGRAM_OUTPUT
+        CHECKSYM_TIME=$(echo "$PROGRAM_OUTPUT" | cut -d ',' -f 1)
+        TRANSPOSITION_TIME=$(echo "$PROGRAM_OUTPUT" | cut -d ',' -f 2)
+
+        # Measure cache misses with perf
+        CACHE_MISSES=$(perf stat -e cache-misses ./matrix_transp_imp_perf $n 2>&1 | grep "cache-misses" | awk '{print $1}' | tr -d ',')
+        if [[ -z "$CACHE_MISSES" ]]; then
+            CACHE_MISSES="ERROR"
+        fi
+
+        # Combine the results into a CSV line
+        echo "$n, $i, $CHECKSYM_TIME, $TRANSPOSITION_TIME, $CACHE_MISSES" >> $OUTPUT_FILE
+    done
+done
