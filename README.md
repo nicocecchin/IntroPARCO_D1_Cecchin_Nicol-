@@ -32,15 +32,18 @@ in the terminal. You will be asked to put your unitn password. Then the copy to 
 
 ## Jobs submission
 Move now to the cluster terminal, where now you can start to submit the jobs.
+To avoid conversion problem, you should add a *dos2unix* command before running the jobs.
 
 ### Sequential implementation
 These two jobs will compile the C++ code *matrix_transp_seq.cpp*
 - We submit the job described in *job_submission_seq_time.pbs*, that will provide us a CSV file with the times of the functions *checkSym* and      *matTranspose*. This job will run in the **short_cpuQ**. to run the job use this code in the cluster terminal:
     ```
+    dos2unix job_submission_seq_time.pbs
     qsub job_submission_seq_time.pbs
     ```
 - We submit the job described in *job_submission_seq_perf.pbs*, that will provide us a CSV file with the times of the functions *checkSym* and      *matTranspose*, together with the number of cache misses of every run of the code. This job will run in the **short_cpuQ**. to run the job use this code in the cluster terminal:
     ```
+    dos2unix job_submission_seq_perf.pbs
     qsub job_submission_seq_perf.pbs
     ```
 
@@ -48,16 +51,19 @@ These two jobs will compile the C++ code *matrix_transp_seq.cpp*
 These two jobs will compile the C++ code *matrix_transp_imp.cpp*
 - We submit the job described in *job_submission_imp_opt_time.pbs*, that will provide us a CSV file with the times of the functions *checkSym* and      *matTranspose*. This job will run in the **short_cpuQ**. to run the job use this code in the cluster terminal:
     ```
+    dos2unix job_submission_imp_opt_time.pbs
     qsub job_submission_imp_opt_time.pbs
     ```
 - We submit the job described in *job_submission_imp_opt_perf.pbs*, that will provide us a CSV file with the times of the functions *checkSym* and      *matTranspose*, together with the number of cache misses of every run of the code. This job will run in the **short_cpuQ**. to run the job use this code in the cluster terminal:
     ```
+    dos2unix job_submission_imp_opt_perf.pbs
     qsub job_submission_imp_opt_perf.pbs
     ```
 ### Explicit parallelization implementation with OpenMP
 This job will compile the C++ code *matrix_transp_imp.cpp*
 - We submit the job described in *job_submission_omp_time.pbs*, that will provide us a pbs file with the times of the functions *checkSym* and      *matTranspose*, using 1, 2, 4, 8, 16 and 32 threads. This job will run in the **short_cpuQ**. to run the job use this code in the cluster terminal:
     ```
+    dos2unix job_submission_omp_time.pbs
     qsub job_submission_omp_time.pbs
     ```
 
