@@ -6,7 +6,7 @@ This repo is the collection of codes related to the project "Parallel Matrix Tra
 and Explicit Parallelism with OpenMP". The following are the instruction to replicate the results presented in the report.
 
 Disclaimer: I used **WSL** (Windows subsystem for Linux) on my local machine to run all the codes (i. e. python codes for the graphs), so this tutorial uses Linux commands.
-To run the Python files you need to have Python installed. Version and requested modules are specified in the report.
+To run the Python files you need to have Python installed. (version 3.8.10, modules: pandas, matplotlib.pyplot).
 
 
 ## Environment setup
@@ -23,7 +23,7 @@ After you put your Unitn password, you should log in.
 
 
 ## Load into HPC cluster
-You should now open the terminal and navigate it up to the repository folder. Now to load every C++ code and the PBS job submissions you have to use the command
+You should now open your local terminal and navigate it up to the repository folder. Now to load every C++ code and the PBS job submissions you have to use the command
 ```
 scp ./codes_and_jobs/* your.username@hpc.unitn.it:/home/your.usename/
 ```
